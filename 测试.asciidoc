@@ -13,4 +13,4 @@ include::Home.asciidoc[tabsize=0]
 
 = 测试啊啊
 
-include::Home.asciidoc
+include::Home.asciidoc[]
