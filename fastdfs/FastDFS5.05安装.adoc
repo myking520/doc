@@ -1,0 +1,132 @@
+
+=  安装依赖 
+
+tracker与storage 服务器都先安执行如下操作
+====
+yum install -y zlib zlib-devel pcre pcre-devel gcc gcc-c++ openssl openssl-devel libevent libevent-devel perl unzip
+====
+== tracker 服务器
+. tracker服务器创建tracker的数据文件和日志目录
++
+====
+ mkdir /usr/local/fastdfs_trace_data
+====
+
+== storage服务器（存储）
+. storage 创建storage的日志目录:
+[NOTE]
+这个目录是用来存储storage之间同步文件等日志的
++
+====
+ mkdir /usr/local/fastdfs_storage_info
+====
+. 配置storage的存储文件目录:
+[NOTE]
+这个目录是用来存储文件的
+====
+ mkdir /usr/local/fastdfs_storage_data
+====
+
+= 安装libfastcommon
+
+[NOTE]
+下载地址: https://github.com/happyfish100/libfastcommon/archive/V1.0.7.zip
+----
+unzip V1.0.7.zip 
+cd libfastcommon-1.0.7
+./make.sh
+./make.sh install
+----
+[WARNING]
+上述安装的路径在/usr/lib64/，但是FastDFS主程序设置的lib目录是/usr/local/lib，所以需要创建软连接如下
+----
+ln -s /usr/lib64/libfastcommon.so /usr/local/lib/libfastcommon.so
+ln -s /usr/lib64/libfastcommon.so /usr/lib/libfastcommon.so
+ln -s /usr/lib64/libfdfsclient.so /usr/local/lib/libfdfsclient.so
+ln -s /usr/lib64/libfdfsclient.so /usr/lib/libfdfsclient.so
+----
+= 安装fastdfs-5.05
+[NOTE]
+下载地址 https://github.com/happyfish100/fastdfs/archive/V5.05.zip
+----
+unzip V5.05.zip
+cd fastdfs-5.05/
+./make.sh 
+./make.sh install
+----
+
+= 配置trackerServer
+. 进入/etc/fdfs文件夹，执行命令: 
+====
+cp  tracker.conf.sample  tracker.conf
+====
+. 编辑tracker.conf
+----
+disabled=false #启用配置文件
+port=22122 #设置tracker的端口号，一般采用22122这个默认端口
+base_path=/usr/local/fastdfs_trace_data #设置tracker的数据文件和日志目录（预先创建）
+http.server_port=8080 #设置http端口号注意，这个配置在fastdfs5.05这个版本中已经不用配置，不用管这个！
+----
+. 启动tracker
+====
+fdfs_trackerd   /etc/fdfs/tracker.conf  restart
+====
+[NOTE]
+使用命令查看是否启动成功
+====
+. netstat -unltp|grep fdfs 查看查看22122端口监听情况 
+. 通过以下命令查看tracker的启动日志，看是否有错误: +
+tail -100f  /usr/local/fastdfs_trace_data/logs/trackerd.log
+====
+
+== 自动启动
+将如下命令添加到/etc/rc.d/rc.local文件中 +
+fdfs_trackerd /etc/fdfs/tracker.conf
+
+= 配置storageServer
+storage 的安装方式与tracker 相同。只是不再启动tracker
+. 进入/etc/fdfs文件夹，执行命令
++
+====
+cp  storage.conf.sample  storage.conf
+====
+. 编辑storage.conf
++
+----
+#启用配置文件
+disabled=false            
+#组名，根据实际情况修改
+group_name=group0    
+#设置storage的端口号，默认是23000，同一个组的storage端口号必须一致
+port=23000     
+#设置storage的日志目录（需预先创建）
+base_path=/usr/local/fastdfs_storage_info   
+#存储路径个数，需要和store_path个数匹配
+store_path_count=1  
+#存储路径
+store_path0=/usr/local/fastdfs_storage_data  
+#tracker服务器的IP地址和端口号
+tracker_server=192.168.1.14:22122  
+#设置http端口号   注意，这个配置在fastdfs5.05这个版本中已经不用配置，不用管这个！
+http.server_port=8080
+----
+. 启动storage
++
+====
+fdfs_storaged  /etc/fdfs/storage.conf  restart
+====
+[NOTE]
+使用命令查看是否启动成功
++
+====
+. netstat -unltp|grep fdfs，查看23000端口监听情况 
+. 通过以下命令查看storage的启动日志，看是否有错误: +
+tail -100f  /usr/local/fastdfs_storage_info/logs/storaged.log 
+====
+
+== 自动启动
+
+将如下命令添加到/etc/rc.d/rc.local文件中 +
+/fdfs_storage /etc/fdfs/storage.conf
+
+
