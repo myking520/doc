@@ -1,33 +1,22 @@
+= 存储服务
+孔国安
+:doctype: book
+:encoding: utf-8
+:lang: zh_cn
+:toc: left
+:numbered:
 
-=  安装依赖 
 
-tracker与storage 服务器都先安执行如下操作
+
+= 环境安装
+
+== trackerServer与storageServer 安装依赖 
+
 ====
 yum install -y zlib zlib-devel pcre pcre-devel gcc gcc-c++ openssl openssl-devel libevent libevent-devel perl unzip
 ====
-== tracker 服务器
-. tracker服务器创建tracker的数据文件和日志目录
-+
-====
- mkdir /usr/local/fastdfs_trace_data
-====
 
-== storage服务器（存储）
-. storage 创建storage的日志目录:
-[NOTE]
-这个目录是用来存储storage之间同步文件等日志的
-+
-====
- mkdir /usr/local/fastdfs_storage_info
-====
-. 配置storage的存储文件目录:
-[NOTE]
-这个目录是用来存储文件的
-====
- mkdir /usr/local/fastdfs_storage_data
-====
-
-= 安装libfastcommon
+=== 安装libfastcommon
 
 [NOTE]
 下载地址: https://github.com/happyfish100/libfastcommon/archive/V1.0.7.zip
@@ -45,7 +34,7 @@ ln -s /usr/lib64/libfastcommon.so /usr/lib/libfastcommon.so
 ln -s /usr/lib64/libfdfsclient.so /usr/local/lib/libfdfsclient.so
 ln -s /usr/lib64/libfdfsclient.so /usr/lib/libfdfsclient.so
 ----
-= 安装fastdfs-5.05
+=== 安装fastdfs-5.05
 [NOTE]
 下载地址 https://github.com/happyfish100/fastdfs/archive/V5.05.zip
 ----
@@ -55,10 +44,20 @@ cd fastdfs-5.05/
 ./make.sh install
 ----
 
-= 配置trackerServer
-. 进入/etc/fdfs文件夹，执行命令: 
+
+
+
+== 配置trackerServer
+
+. 创建tracker的数据文件和日志目录
++
 ====
-cp  tracker.conf.sample  tracker.conf
+ mkdir /usr/local/fastdfs_trace_data
+====
+. 进入/etc/fdfs文件夹，执行命令: 
++
+====
+cp  tracker.conf.sample  tracker.conf 
 ====
 . 编辑tracker.conf
 ----
@@ -79,13 +78,24 @@ fdfs_trackerd   /etc/fdfs/tracker.conf  restart
 tail -100f  /usr/local/fastdfs_trace_data/logs/trackerd.log
 ====
 
-== 自动启动
-将如下命令添加到/etc/rc.d/rc.local文件中 +
-fdfs_trackerd /etc/fdfs/tracker.conf
+== 配置storageServer
 
-= 配置storageServer
-storage 的安装方式与tracker 相同。只是不再启动tracker
-. 进入/etc/fdfs文件夹，执行命令
+. 创建storage的日志目录:
+[NOTE]
+这个目录是用来存储storage之间同步文件等日志的
++
+====
+ mkdir /usr/local/fastdfs_storage_info
+====
+
+. 配置storage的存储文件目录:
+[NOTE]
+这个目录是用来存储文件的
++
+====
+ mkdir /usr/local/fastdfs_storage_data
+====
+. 进入/etc/fdfs文件夹，执行命令:
 +
 ====
 cp  storage.conf.sample  storage.conf
@@ -94,7 +104,7 @@ cp  storage.conf.sample  storage.conf
 +
 ----
 #启用配置文件
-disabled=false            
+disabled=false          
 #组名，根据实际情况修改
 group_name=group0    
 #设置storage的端口号，默认是23000，同一个组的storage端口号必须一致
@@ -124,9 +134,8 @@ fdfs_storaged  /etc/fdfs/storage.conf  restart
 tail -100f  /usr/local/fastdfs_storage_info/logs/storaged.log 
 ====
 
-== 自动启动
 
-将如下命令添加到/etc/rc.d/rc.local文件中 +
-/fdfs_storage /etc/fdfs/storage.conf
+
+
 
 
