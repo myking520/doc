@@ -1,0 +1,56 @@
+## 故事语法
+
+----
+A story is a collection of scenarios
+ 
+Narrative:
+In order to communicate effectively to the business some functionality
+As a development team
+I want to use Behaviour-Driven Development
+ 
+Lifecycle: 
+Before:
+Given a step that is executed before each scenario 
+After:
+Outcome: ANY    
+Given a step that is executed after each scenario regardless of outcome
+Outcome: SUCCESS 
+Given a step that is executed after each successful scenario
+Outcome: FAILURE 
+Given a step that is executed after each failed scenario
+ 
+Scenario:  A scenario is a collection of executable steps of different type
+ 
+Given step represents a precondition to an event
+When step represents the occurrence of the event
+Then step represents the outcome of the event
+ 
+Scenario:  Another scenario exploring different combination of events
+ 
+Given a [precondition]
+When a negative event occurs
+Then a the outcome should [be-captured]    
+ 
+Examples: 
+|precondition|be-captured|
+|abc|be captured    |
+|xyz|not be captured|
+----
+## 步骤注解
+@Given  给与
+
+@When  当
+@Then 那么
+@Alias 别名
+[source,java]
+----
+@Given("一个业务人员")
+@Alias("一个产品人员")
+public void person1() {
+----
+@Aliases 别名与Alias相同。只是这个值指定多个别名
+
+@Pending 表示还未实现它只是告诉场景的作者，它还没有实现，相应地它不会执行任何步骤，在相同的情况下。
+在某些情况下，思想，它可能是有用的，使场景失败时，步骤正在等待。行为是通过配置pendingstepstrategy通过配置控制
+
+@Composite 把多个Steps组合为一个Step

@@ -1,0 +1,25 @@
+// 使用命令需要加参数gradle build --refresh-dependencies
+//转换为eclipse 需要使用命令gradle eclipse --refresh-dependencies
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'maven'
+apply plugin: "maven-publish"
+[compileJava, javadoc, compileTestJava]*.options*.encoding = 'UTF-8'
+sourceCompatibility=1.6
+targetCompatibility=1.6
+version="1.0"
+repositories {
+	 maven {url "http://192.168.1.21:8090/nexus/content/groups/public/"}
+	// maven {url "http://repo.opennms.org/maven2/"}
+	//maven {url "http://192.168.1.21:8090/nexus/content/repositories/jcenter/"}
+}
+
+
+dependencies {
+	testCompile group: 'org.jbehave', name: 'jbehave-core', version: '4.1'
+	testCompile group: 'org.jbehave', name: 'jbehave-spring', version: '4.1'
+   
+}
+
+
+
