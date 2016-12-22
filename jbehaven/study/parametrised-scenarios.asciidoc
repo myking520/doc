@@ -1,0 +1,219 @@
+## 参数化场景
+### 参数化场景
+
+故事作家经常发现自己重复的场景，或部分，通过简单地改变一些参数值。这些都是使用JBehave理想化特征。让我们来看一看例子：
+----
+Given a stock of symbol STK1 and a threshold of 10.0
+When the stock is traded at 5.0
+Then the alert status should be OFF
+When the stock is traded at 11.0
+Then the alert status should be ON
+----
+我们注意到两行重复和相同，但值。然后，我们可以重写这种情况下：
+----
+Given a stock of <symbol> and a <threshold>
+When the stock is traded at <price>
+Then the alert status should be <status>
+ 
+Examples:     
+|symbol|threshold|price|status|
+|STK1|10.0|5.0|OFF|
+|STK1|10.0|11.0|ON|
+----
+Examples 关键字表示每次执行时候从相应的行取对应的命名参数
+----
+@Given("a stock of symbol $symbol and a threshold of $threshold") // standalone
+@Alias("a stock of <symbol> and a <threshold>") // examples table
+public void aStock(@Named("symbol") String symbol, @Named("threshold") double threshold) {
+    // ...
+}
+----
+此外，实例表别名可以愉快地与其他独立的别名存在：
+----
+@Given("a stock of symbol $symbol and a threshold of $threshold") // standalone
+@Aliases(values={"a stock with a symbol of $symbol and a threshold of $threshold", // a standalone alias
+                 "a stock of <symbol> and a <threshold>"}) // an examples table alias
+public void aStock(@Named("symbol") String symbol, @Named("threshold") double threshold) {
+    // ...
+}
+----
+#### 完整示例
+.s6_2_story.story
+----
+Narrative:
+In order to 试用BDD的开发方式
+as a 开发人员
+I want to 使用jbehave开发
+so that 熟悉jbehave的使用
+
+Scenario: 弄一个pineapple
+Given a stock of <symbol> and a <threshold>
+
+When the stock is traded at <price>
+
+Then the alert status should be <status>
+
+
+
+Examples:
+
+|symbol|threshold|price|status|
+
+|STK1|10.0|5.0|OFF|
+
+|STK1|10.0|11.0|ON|
+
+----
+.S6_2Step.java
+[source,java]
+----
+package jbehave.myking520.github.junit.steps.ls6;
+
+import org.jbehave.core.annotations.Alias;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Named;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
+
+public class S6_2Step {
+	@Given("a stock of symbol $symbol and a threshold of $threshold") // standalone
+
+	@Alias("a stock of <symbol> and a <threshold>") // examples table
+
+	public void aStock(@Named("symbol") String symbol, @Named("threshold") double threshold) {
+		System.out.println("分隔符----------------------------");
+		System.out.println(symbol+"--->"+threshold);
+	}
+	@When("the stock is traded at $price")
+	public void traded(@Named("price") double price){
+		System.out.println("traded-->"+price);
+	}
+	@Then("the alert status should be $status")
+	public void state(String status){
+		System.out.println("status--->"+status);
+	}
+}
+
+----
+.S6_2Story.java
+[source,java]
+----
+package jbehave.myking520.github.junit.stories.ls6;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+
+import jbehave.myking520.github.junit.steps.ls6.S6_2Step;
+
+public class S6_2Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S6_2Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		Configuration configuration = new MostUsefulConfiguration();
+	    return configuration;
+	}
+
+}
+
+----
+.结果
+
+image::images/Image-221216-085830.576.png[]
+
+### 自定义参数分隔符
+比如我们使用"[]"
+.story
+----
+Given a stock of [symbol] and a [threshold]
+When the stock is traded at [price]
+Then the alert status should be [status]
+ 
+Examples:     
+|symbol|threshold|price|status|
+|STK1|10.0|5.0|OFF|
+|STK1|10.0|11.0|ON|
+----
+.step
+[source,java]
+----
+@Given("a stock of [symbol] and a [threshold]")
+public void aStock(@Named("symbol") String symbol, @Named("threshold") double threshold) {
+    // ...
+}
+----
+.storyRunner
+[source,java]
+----
+new MostUsefulConfiguration()
+        .useParameterControls(new ParameterControls().useNameDelimiterLeft("[").useNameDelimiterRight("]"));
+----
+### 根据用户参数化分隔
+#### 方法一
+.stroy
+----
+Given a stock of <symbol> and a <threshold>
+When the stock is traded at <price>
+Then the alert status should be <status>
+ 
+Examples:     
+|symbol|threshold|price|status|
+|STK1|10.0|5.0|OFF|
+|STK1|10.0|11.0|ON|
+----
+.step
+----
+@Given("a stock of $symbol and a $threshold")
+public void aStock(String symbol, double threshold) {
+    // ...
+}
+----
+.storyRunner
+----
+new MostUsefulConfiguration()
+        .useParameterControls(new ParameterControls().useDelimiterNamedParameters(true));
+----
+#### 方法二
+.story
+----
+Given a stock of <symbol> and a <threshold>
+And a stock of <alternate_symbol> and a <threshold>
+ 
+Examples:     
+|symbol|alternate_symbol|threshold|
+|STK1|ALT1|1.0|
+----
+.step
+----
+@Given("a stock of symbol $symbol") 
+public void aStock(String symbol) {
+    // ...
+}
+----
+### 从外部资源加载参数
+.story
+----
+Given a stock of <symbol> and a <threshold>
+When the stock is traded at <price>
+Then the alert status should be <status>
+ 
+Examples: 
+org/jbehave/examples/trader/stories/trades.table   
+----
+.trades.table
+----
+|symbol|threshold|price|status|
+|STK1|10.0|5.0|OFF|
+|STK1|10.0|11.0|ON|
+----
+.storyRunner
+----
+new MostUsefulConfiguration()
+        .useStoryParser(new RegexStoryParser(new ExamplesTableFactory(new LoadFromClasspath(this.getClass()))))
+----

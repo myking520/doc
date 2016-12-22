@@ -1,0 +1,16 @@
+## 利用文本的故事
+从外部加载故事
+.例子
+----
+!-- A precondition to entire story
+GivenStories: path/to/precondition1.story
+ 
+Scenario:  A scenario in which the user can run additional stories as pre-requisites
+ 
+!-- preconditions to scenario    
+GivenStories: path/to/precondition2.story,
+              ...
+              path/to/preconditionN.story
+ 
+Given ... // normal scenario steps
+----
