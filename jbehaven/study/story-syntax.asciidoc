@@ -38,19 +38,208 @@ Examples:
 ----
 ## 步骤注解
 @Given  给与
-
+[source,java]
+-----
+@Given("a pen")
+public void pen(){
+	System.out.println("I have a pen");
+}
+-----
 @When  当
+[source,java]
+-----
+@When("an apple")
+public void apple(){
+	System.out.println("I have an apple");
+}
+-----
 @Then 那么
+[source,java]
+-----
+@Then("pineapple")
+public void pineapple(){
+	System.out.println("I have pineapple");
+}
+-----
 @Alias 别名
 [source,java]
 ----
-@Given("一个业务人员")
-@Alias("一个产品人员")
-public void person1() {
+@Given("a pen")
+@Alias("a red pen")
+public void pen(){
+	System.out.println("I have a pen");
+}
 ----
 @Aliases 别名与Alias相同。只是这个值指定多个别名
+[source,java]
+-----
+@When("an apple")
+@Aliases(values={"a big apple","a small apple"})
+public void apple(){
+	System.out.println("I have an apple");
+}
+-----
 
 @Pending 表示还未实现它只是告诉场景的作者，它还没有实现，相应地它不会执行任何步骤，在相同的情况下。
 在某些情况下，思想，它可能是有用的，使场景失败时，步骤正在等待。行为是通过配置pendingstepstrategy通过配置控制
+[source,java]
+-----
+@Pending
+public void eat(){
+	
+}
+-----
+完全示例
 
+.s1_story.story
+-----
+Narrative:
+In order to 试用BDD的开发方式
+as a 开发人员
+I want to 使用jbehave开发
+so that 熟悉jbehave的使用
+
+Scenario: 弄一个pineapple
+Given a pen
+When an apple
+Then pineapple
+-----
+.S1Step.java
+[source,java]
+-----
+package jbehave.myking520.github.junit.steps.ls1;
+
+import org.jbehave.core.annotations.Alias;
+import org.jbehave.core.annotations.Aliases;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Pending;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
+
+public class S1Step {
+	@Given("a pen")
+	@Alias("a red pen")
+	public void pen(){
+		System.out.println("I have a pen");
+	}
+	@When("an apple")
+	@Aliases(values={"a big apple","a small apple"})
+	public void apple(){
+		System.out.println("I have an apple");
+	}
+	@Then("pineapple")
+	public void pineapple(){
+		System.out.println("I have pineapple");
+	}
+	@Pending
+	public void eat(){
+		
+	}
+}
+-----
+.S1Story.java
+[source,java]
+----
+package jbehave.myking520.github.junit.stories.ls1;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+
+import jbehave.myking520.github.junit.steps.ls1.S1Step;
+
+public class S1Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S1Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		return new MostUsefulConfiguration();
+	}
+}
+
+----
+运行结果
+
+image::images/Image-221216-035053.408.png[]
 @Composite 把多个Steps组合为一个Step
+
+.s2_story.story
+-----
+Narrative:
+In order to 试用BDD的开发方式
+as a 开发人员
+I want to 使用jbehave开发
+so that 熟悉jbehave的使用
+
+Scenario: 弄一个pineapple
+Given a pen
+-----
+.S2Step.java
+[source,java]
+-----
+package jbehave.myking520.github.junit.steps.ls2;
+
+import org.jbehave.core.annotations.Alias;
+import org.jbehave.core.annotations.Aliases;
+import org.jbehave.core.annotations.Composite;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Pending;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
+
+public class S2Step {
+	@Given("a pen")
+	@Composite(steps={"When an apple","Then pineapple"})
+	public void pen(){
+		System.out.println("I have a pen");
+	}
+	
+	@When("an apple")
+	@Aliases(values={"a big apple","a small apple"})
+	public void apple(){
+		System.out.println("I have an apple");
+	}
+	@Then("pineapple")
+	public void pineapple(){
+		System.out.println("I have pineapple");
+	}
+	@Pending
+	public void eat(){
+		
+	}
+}
+
+-----
+.S2Story.java
+[source,java]
+------
+package jbehave.myking520.github.junit.stories.ls2;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+
+import jbehave.myking520.github.junit.steps.ls2.S2Step;
+
+public class S2Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S2Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		return new MostUsefulConfiguration();
+	}
+}
+------
+运行结果
+
+image::images/Image-221216-044539.482.png[]

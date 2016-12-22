@@ -6,6 +6,4 @@ so that 熟悉jbehave的使用
 
 Scenario: 弄一个pineapple
 Given a pen
-When an apple
-Then pineapple
 

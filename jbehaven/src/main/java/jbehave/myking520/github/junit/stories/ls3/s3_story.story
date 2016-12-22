@@ -5,7 +5,7 @@ I want to 使用jbehave开发
 so that 熟悉jbehave的使用
 
 Scenario: 弄一个pineapple
-Given a pen
-When an apple
-Then pineapple
+When the item cost is 10.0
+When the price is 11.0
+When the cost is 12.0
 

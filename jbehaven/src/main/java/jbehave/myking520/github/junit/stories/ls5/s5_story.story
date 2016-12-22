@@ -5,7 +5,4 @@ I want to 使用jbehave开发
 so that 熟悉jbehave的使用
 
 Scenario: 弄一个pineapple
-Given a pen
-When an apple
-Then pineapple
-
+Given a stock of symbol STK1 and a threshold of 10.0

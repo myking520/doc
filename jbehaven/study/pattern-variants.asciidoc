@@ -1,0 +1,61 @@
+## 模式变体(Pattern Variants)
+有点类似于正则对“{}”表示里面的值进行原则“|”表示有无
+
+.例如
+------
+A {x|y|z} B => A x B, A y B, A z B
+------
+.s3_story.story
+-----
+Narrative:
+In order to 试用BDD的开发方式
+as a 开发人员
+I want to 使用jbehave开发
+so that 熟悉jbehave的使用
+
+Scenario: 弄一个pineapple
+When the item cost is 10.0
+When the price is 11.0
+When the cost is 12.0
+-----
+.S3Step.java
+[source,java]
+-----
+package jbehave.myking520.github.junit.steps.ls3;
+
+import org.jbehave.core.annotations.When;
+
+public class S3Step {
+	@When("the {item |}{price|cost} is $price")
+	public void theItemPriceIs(double price) {
+	   System.out.println(price);
+	}
+}
+-----
+.S3Story.java
+[source,java]
+------
+package jbehave.myking520.github.junit.stories.ls3;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+
+import jbehave.myking520.github.junit.steps.ls3.S3Step;
+
+public class S3Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S3Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		return new MostUsefulConfiguration();
+	}
+}
+------
+.结果
+image::images/Image-221216-045803.173.png[]

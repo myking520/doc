@@ -1,0 +1,44 @@
+## 参数注入
+### 顺序参数
+示例.
+====
+Given a stock of symbol STK1 and a threshold of 10.0
+====
+参数“STK1”和“10”匹配的java方法的第一和第二方法参数：
+[source,java]
+-----
+@Given("a stock of symbol $symbol and a threshold of $threshold")
+public void aStock(String symbol, double threshold) {
+    System.out.println(symbol+"-->"+threshold);
+}
+-----
+实际上他绑定的参数与变量名无关，也就是说$symbol 可以命名为其他。但是让他们匹配是最好的做法
+
+.这么写也是对的
+[source,java]
+----
+@Given("a stock of symbol $symbol and a threshold of $threshold")
+public void aStock(String sym2bol, double thres2hold) {
+	 System.out.println(sym2bol+"-->"+thres2hold);
+}
+----
+
+### 注释命名参数
+如果我们想拥有命名参数，一个机制是使用注释.使用命名参数的一个原因是，我们可以有任何顺序出现的方法参数.
+
+[source,java]
+----
+@Given("a stock of symbol $symbol and a threshold of $threshold")
+public void aStock(@Named("threshold") double aThreshold, @Named("symbol") String aSymbol) {
+     System.out.println(aSymbol+"---->"+aThreshold);
+}
+----
+### 通过配置参数解析器
+使用命名参数等效的方式，不使用注释，是利用paranamer，通过配置配置
+
+[source,java]
+----
+Paranamer paranamer =  new CachingParanamer(new BytecodeReadingParanamer());
+StepConfiguration configuration = new Configuration();
+configuration.useParanamer(paranamer);
+----

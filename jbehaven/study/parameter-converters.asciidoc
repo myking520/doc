@@ -1,0 +1,188 @@
+## 参数转换
+### 自定义参数转换
+.stroy
+----
+Given a stock of symbols STK1,STK2 and thresholds of 10.0,20.0
+----
+.step
+[source,java]
+----
+@Given("a stock of symbols $symbols and thresholds $thresholds")
+public void aStock(List<String> symbols, List<Double> thresholds) {
+   System.out.println(Arrays.toString(symbols.toArray(new String[symbols.size()]))+"-->"+Arrays.toString(thresholds.toArray(new Double[thresholds.size()])));
+}
+----
+[source,java]
+-----
+@Override
+public Configuration configuration() {
+    Keywords keywords = new LocalizedKeywords(locale());
+    Configuration configuration = new MostUsefulConfiguration()
+            .useParameterConverters(
+                    new ParameterConverters().addConverters(customConverters(keywords)));
+    return configuration;
+}
+ 
+private ParameterConverter[] customConverters(Keywords keywords) {
+    List<ParameterConverter> converters = new ArrayList<ParameterConverter>();
+    converters.add(new NumberConverter(NumberFormat.getInstance(locale()))); // custom number format
+    converters.add(new DateConverter(new SimpleDateFormat("yyyy-MM-dd")));  // custom date pattern
+    converters.add(new ExamplesTableConverter(new ExamplesTableFactory(new LoadFromClasspath(this.getClass()))); // custom examples table loader
+    return converters.toArray(new ParameterConverter[converters.size()]);
+}
+-----
+#### 完整示例
+.s6_1_story.story
+-----
+Narrative:
+In order to 试用BDD的开发方式
+as a 开发人员
+I want to 使用jbehave开发
+so that 熟悉jbehave的使用
+
+Scenario: 弄一个pineapple
+Given a stock of symbols STK1,STK2 and thresholds of 10.0,20.0
+-----
+.S6_1Step.java
+-----
+package jbehave.myking520.github.junit.steps.ls6;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.jbehave.core.annotations.Given;
+
+public class S6_1Step {
+	@Given("a stock of symbols $symbols and thresholds of  $thresholds")
+	public void aStock(List<String> symbols, List<Double> thresholds) {
+		
+		System.out.println(Arrays.toString(symbols.toArray(new String[symbols.size()]))+"-->"+Arrays.toString(thresholds.toArray(new Double[thresholds.size()])));
+	}
+}
+
+-----
+.S6_1Story.java
+----
+package jbehave.myking520.github.junit.stories.ls6;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+import org.jbehave.core.steps.ParameterConverters;
+import org.jbehave.core.steps.ParameterConverters.NumberListConverter;
+import org.jbehave.core.steps.ParameterConverters.ParameterConverter;
+import org.jbehave.core.steps.ParameterConverters.StringListConverter;
+
+import jbehave.myking520.github.junit.steps.ls6.S6_1Step;
+
+public class S6_1Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S6_1Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		Configuration configuration = new MostUsefulConfiguration()
+
+	            .useParameterConverters(
+
+	                    new ParameterConverters().addConverters(customConverters()));
+
+	    return configuration;
+	}
+	private ParameterConverter[] customConverters() {
+
+	    List<ParameterConverter> converters = new ArrayList<ParameterConverter>();
+	   	converters.add(new StringListConverter()); <1>
+	    converters.add(new NumberListConverter()); <2>
+	    return converters.toArray(new ParameterConverter[converters.size()]);
+
+	}
+}
+
+----
+<1> stirng 转换为string数组
+<2> String 转换为number数组
+
+.输出
+image::images/Image-221216-061421.711.png[]
+
+### 声明参数转换
+[source,java]
+-----
+public class TraderConverter implements ParameterConverter {
+    private TraderPersister traderPersister = ... // inject persister in converter
+ 
+    public boolean accept(Type type) {
+        if (type instanceof Class<?>) {
+            return Trader.class.isAssignableFrom((Class<?>) type);
+        }
+        return false;
+    }
+ 
+    public Object convertValue(String value, Type type) {
+        return traderPersister.retrieveTrader(value);
+    }
+}
+-----
+.story
+-----
+Given a trader of name Mauro
+-----
+.step.java
+-----
+@Given("a trader of name $name")
+public void aTrader(Trader trader) {
+    // Trader object is provided to the method as parameter
+}
+-----
+### 参数转换注解
+[source,java]
+----
+public MySteps() {
+    // Method used as dynamical parameter converter
+    @AsParameterConverter
+    public Trader createTrader(String name){
+        return traderPersister.retrieveTrader(name);
+    }
+ 
+}
+----
+
+[source,java]
+----
+public MyStory extends JUnitStory {
+    @Override
+    public InjectableStepsFactory stepsFactory() {
+        return new InstanceStepsFactory(configuration(), new MySteps(), new BeforeAfterSteps());
+    }
+}
+----
+.示例
+----
+public class CalendarSteps {
+
+	@Given("a plan with calendar date of <date>")
+	public void aPlanWithCalendar(@Named("date") Calendar calendar) {
+		System.out.println(calendar);
+	}
+
+	@Then("the claimant should receive an amount of <amount>")
+	public void theClaimantReceivesAmount(@Named("amount") double amount) {
+		System.out.println(amount);
+	}
+	
+	@AsParameterConverter
+	public Calendar calendarDate(String value){ <1>
+	    return (Calendar) new CalendarConverter("dd/MM/yyyy").convertValue(value, Calendar.class);
+	}
+
+}
+----
+<1> 日期转换
