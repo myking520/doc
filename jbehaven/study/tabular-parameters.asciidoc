@@ -1,0 +1,140 @@
+## 表格参数
+### 表格参数
+场景编辑器可能希望以表格结构表示参数.。例如:
+----
+Given the traders: 
+|name|rank|
+|Larry|Stooge 3|
+|Moe|Stooge 1|
+|Curly|Stooge 2|
+When Traders are subset to ".*y" by name
+Then the traders returned are:
+|name|rank|
+|Larry|Stooge 3|
+|Curly|Stooge 2|
+----
+用户只需要声明的参数类型，它会自动解析为一个表格结构examplestable：
+[source,java]
+----
+Given("the traders ranks are: $ranksTable")
+public void theTraders(ExamplesTable ranksTable) {
+    this.ranksTable = ranksTable;
+    this.traders = toTraders(ranksTable);
+}
+ 
+private List toTraders(ExamplesTable table) {
+    List traders = new ArrayList();
+    for (Map<String,String> row : table.getRows()) {
+        String name = row.get("name");
+        String rank = row.get("rank");
+        traders.add(new Trader(name, rank));
+    }
+    return traders;
+}
+----
+示例
+.s7_story.story
+-----
+Given the traders:
+
+|name|rank|
+
+|Larry|Stooge 3|
+
+|Moe|Stooge 1|
+
+|Curly|Stooge 2|
+
+-----
+.S7Step.java
+[source,java]
+----
+package jbehave.myking520.github.junit.steps.ls7;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.model.ExamplesTable;
+
+public class S7Step {
+	
+	@Given("the traders ranks are: $ranksTable")
+
+	public void theTraders(ExamplesTable ranksTable) {
+			System.out.println("--------------------theTraders----------------");
+		 List traders= toTraders(ranksTable);
+	}
+	private List toTraders(ExamplesTable table) {
+
+	    List traders = new ArrayList();
+
+	    for (Map<String,String> row : table.getRows()) {
+
+	        String name = row.get("name");
+
+	        String rank = row.get("rank");
+	        System.out.println(name+"-->"+rank);
+	    }
+
+	    return traders;
+
+	}
+	
+}
+
+----
+.S7Story.java
+[source,java]
+----
+package jbehave.myking520.github.junit.stories.ls7;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+
+import jbehave.myking520.github.junit.steps.ls7.S7Step;
+
+public class S7Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S7Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		return new MostUsefulConfiguration();
+	}
+}
+
+----
+.结果
+image::images/Image-231216-023935.878.png[]
+### 参数表格
+-----
+Given that Larry has done <trades> trades
+Then the traders activity is: 
+|name|trades|
+|Larry|<trades>|
+|Moe|1000|
+|Curly|2000|
+ 
+Examples:
+|<trades>|
+|3000|
+|5000|
+-----
+[source,java]
+-----
+@Then("the traders activity is: $table")
+public void theTraderActivityIs(ExamplesTable table) {
+    boolean replaceNamedParameters = true;
+    int trades = table.getRowAsParameters(0, replaceNamedParameters).valueAs("trades", int.class);
+    // expect 3000 
+}
+-----
+示例
+

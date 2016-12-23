@@ -5,7 +5,7 @@ I want to 使用jbehave开发
 so that 熟悉jbehave的使用
 
 Scenario: 弄一个pineapple
-GivenStories: jbehave/myking520/github/junit/stories/ls6/s6_3_1_story.story#{1}
+GivenStories: jbehave/myking520/github/junit/stories/ls6/s6_3_1_story.story
 Given a stock of <symbol> and a <threshold>
 
 When the stock is traded at <price>
