@@ -5,7 +5,10 @@ I want to 使用jbehave开发
 so that 熟悉jbehave的使用
 
 Scenario: 弄一个pineapple
+Given a stock of <symbol> and a <threshold>
 
+When the stock is traded at <price>
 
-Given a stock of symbol <symbol> and a threshold of <threshold>
+Then the alert status should be <status>
+
 

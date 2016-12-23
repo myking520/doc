@@ -4,17 +4,20 @@ as a 开发人员
 I want to 使用jbehave开发
 so that 熟悉jbehave的使用
 
-GivenStories: jbehave/myking520/github/junit/stories/ls6/s6_3_1_story.story
-
 Scenario: 弄一个pineapple
+GivenStories: jbehave/myking520/github/junit/stories/ls6/s6_3_1_story.story#{1}
+Given a stock of <symbol> and a <threshold>
 
-GivenStories: jbehave/myking520/github/junit/stories/ls6/s6_3_1_story.story
+When the stock is traded at <price>
 
 
 
-Given a stock of symbol <symbol> and a threshold of <threshold>
- 
-Examples:    
-|stockExchange|symbol|threshold|price|status|
-|NASDAQ|STK1|10.0|5.0|OFF|
-|FTSE|STK2|10.0|11.0|ON|
+
+
+Examples:
+
+|symbol|threshold|price|status|
+
+|STK1|10.0|5.0|OFF|
+
+|STK1|10.0|11.0|ON|

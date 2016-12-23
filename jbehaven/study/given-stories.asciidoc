@@ -1,5 +1,5 @@
 ## 利用文本的故事
-从外部加载故事
+### 从外部加载故事
 .例子
 ----
 !-- A precondition to entire story
@@ -14,3 +14,199 @@ GivenStories: path/to/precondition2.story,
  
 Given ... // normal scenario steps
 ----
+GivenStories 会将被引入的story跑完，在跑引入的story中的数据例如story1.中有步骤1，步骤2，被进入的story2中有步骤1，步骤2
+那么在运行story1的时候在运行步骤1，与步骤2之前，story中的步骤1，和步骤2都会被先运行
+
+.示例
+.s6_3_story.story
+-----
+Narrative:
+In order to 试用BDD的开发方式
+as a 开发人员
+I want to 使用jbehave开发
+so that 熟悉jbehave的使用
+
+Scenario: 弄一个pineapple
+GivenStories: jbehave/myking520/github/junit/stories/ls6/s6_3_1_story.story <1>
+Given a stock of <symbol> and a <threshold>
+
+When the stock is traded at <price>
+
+
+Examples:
+
+|symbol|threshold|price|status|
+
+|STK1|10.0|5.0|OFF|
+
+|STK1|10.0|11.0|ON|
+
+-----
+<1> 被引入的故事
+
+.s6_3_1_story.story
+----
+Narrative:
+In order to 试用BDD的开发方式
+as a 开发人员
+I want to 使用jbehave开发
+so that 熟悉jbehave的使用
+
+Scenario: 弄一个pineapple
+Given a stock of <symbol> and a <threshold>
+
+When the stock is traded at <price>
+
+Then the alert status should be <status> <1>
+
+----
+<1> 与s6_3_story.story的区别。s6_3_1_story.story 会多输出一行
+
+.S6_3Step.java
+[source,java]
+-----
+package jbehave.myking520.github.junit.steps.ls6;
+
+import org.jbehave.core.annotations.Alias;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Named;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
+
+public class S6_3Step {
+	private double sum;
+	@Given("a stock of symbol $symbol and a threshold of $threshold") // standalone
+
+	@Alias("a stock of <symbol> and a <threshold>") // examples table
+
+	public void aStock(@Named("symbol") String symbol, @Named("threshold") double threshold) {
+		System.out.println("分隔符----------------------------");
+		sum+=threshold;
+		System.out.println(symbol+"--->"+sum);
+	}
+	@When("the stock is traded at $price")
+	public void traded(@Named("price") double price){
+		System.out.println("traded-->"+price);
+	}
+	@Then("the alert status should be $status")
+	public void state(String status){
+		System.out.println("status--->"+status);
+	}
+}
+
+-----
+.S6_3Story.java
+[source,java]
+----
+package jbehave.myking520.github.junit.stories.ls6;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+
+import jbehave.myking520.github.junit.steps.ls6.S6_3Step;
+
+public class S6_3Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S6_3Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		Configuration configuration = new MostUsefulConfiguration();
+	    return configuration;
+	}
+
+}
+
+----
+.运行结果
+image::images/Image-231216-120946.757.png[]
+
+### 根据场景元素过滤引入的故事
+一个故事中有多个场景，但是我们只使用其中的部分，例如：
+----
+GivenStories: path/to/precondition.story#{id1:scenario1;id2:scenario2}
+----
+.precondition.story
+----
+Scenario:  Scenario 1
+Meta: @id1 scenario1
+      
+Given ... // scenario executed as a precondition
+ 
+Scenario:  Scenario 2
+Meta: @id2 scenario2
+      
+Given ... // scenario executed as a precondition
+ 
+Scenario:  Scenario 3
+Meta: @id3 scenario3
+      
+Given ... // scenario not executed as a precondition
+----
+### 通过实例参数化GivenStories
+
+#### 有数据源参数化GivenStories
+----
+Meta: @One uno @Two due
+ 
+GivenStories: path/to/precondition.story
+ 
+Scenario:  A scenario which is executed after the parametrised story-level given stories
+ 
+Given ... // normal scenario steps
+----
+#### 通过实例参数化GivenStories
+另一种方法是使用Examples：关键字来收集参数集，允许用户通过锚提供一个可选的附加的＃{row}形式的故事路径，这被解释为参数的行号 注入故事执行。
+
+例如，如果我们想使用两个不同的参数集来执行同一个给定的故事，指定为示例表的第一行和第二行：
+----
+Scenario:  A scenario in which the user can run other stories as pre-requisites
+           parametrized using the rows of the Examples table
+ 
+GivenStories: path/to/precondition.story#{0},
+              path/to/precondition.story#{1}
+ 
+Given ... // normal scenario steps
+ 
+Examples:
+|One|Two|
+|uno|due|
+|un|deux|
+----
+
+完整示例
+修改上面的s6_3_story.story
+.s6_3_story.story
+-----
+Narrative:
+In order to 试用BDD的开发方式
+as a 开发人员
+I want to 使用jbehave开发
+so that 熟悉jbehave的使用
+
+Scenario: 弄一个pineapple
+GivenStories: jbehave/myking520/github/junit/stories/ls6/s6_3_1_story.story#{1}<1>
+Given a stock of <symbol> and a <threshold>
+
+When the stock is traded at <price>
+
+
+Examples:
+
+|symbol|threshold|price|status|
+
+|STK1|10.0|5.0|OFF|
+
+|STK1|10.0|11.0|ON|
+
+-----
+<1> 原来为jbehave/myking520/github/junit/stories/ls6/s6_3_1_story.story 现在加了标注采取数据第2行
+
+.结果
+image::images/Image-231216-122344.285.png[]
+只有第二行的数据被采用
