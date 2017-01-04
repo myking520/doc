@@ -1,0 +1,30 @@
+## 元匹配
+可以通过定义一些数据元信息在用例上面，来过滤一些数据
+
+
+*默认的元数据匹配*
+默认元匹配有一个非常简单的语言结构，反映了元属性，表示为一个序列的名称值模式：
+----
+default meta matcher :== ([+|-] [name] [value pattern])+
+----
+在[ + | -]表示如果过滤器应包括或排除Meta属性和[价值模式]可以是完全匹配的属性值（包括空值）或使用*匹配的符号。
+以下是所有有效元的匹配：
+----
++author Mauro
++theme filtering
++author * +theme filtering
++author * +theme filtering -skip
+-skip
+----
+匹配或不匹配性能的几个例子
+|====
+| Meta Matcher | Meta Property | Matched
+| +theme smoke testing -skip | @theme smoke testing | true
+| +theme smoke testing -skip | @skip | false
+| +theme smoke testing | @theme smoke testing | true
+| +theme smoke testing | @theme testing | false
+| -skip | @theme testing | true
+| -skip | @skip | false
+| +theme smoke testing -theme UI | @theme smoke testing | true
+| +theme smoke testing -theme UI | @theme UI | false
+|====

@@ -1,0 +1,18 @@
+## 元信息
+为了更好的管理故事jbehave 允许在故事和场景中定义他们的元信息，元信息已键值对列表的方式提供
+----
+Meta:
+@author Mauro
+@themes UI Usability
+ 
+Scenario:  A scenario in which the user can view all relevant information via UI    
+Meta:
+@ignored false    
+Given ... // normal scenario steps
+ 
+Scenario:  A scenario which we cannot run every time due to some technical contraint
+Meta:
+@skip    
+@ignored true  
+Given ... // normal scenario steps
+----

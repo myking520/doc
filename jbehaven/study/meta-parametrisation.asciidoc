@@ -1,0 +1,85 @@
+## 元数据参数化
+在我们的故事中的元信息的另一个用途是允许我们的步骤中使用的隐含场景参数的定义。
+例如，我们可以在故事和场景级别（通常继承模式）中定义元属性，并在步骤方法中注入这些参数，就像它们在步骤本身中指定的一样.：
+----
+Meta: 
+ 
+@theme parameters
+ 
+Scenario: scenario with hidden meta params
+ 
+Meta:
+ 
+@variant foo
+ 
+Given I have some step that implicitly requires meta params
+Then the theme is 'parameters' with variant 'foo'
+----
+其中对应的java方法
+[source,java]
+----
+@Given("I have some step that implicitly requires meta params")
+public void givenAThemeAndVariant(@Named("variant") String variant, @Named("theme") String theme) {
+    this.theme = theme;
+    this.variant = variant;
+}
+----
+### 示例
+.s9_story.story
+----
+Meta: 
+ 
+@theme parameters
+ 
+Scenario: scenario with hidden meta params
+ 
+Meta:
+ 
+@variant foo
+ 
+Given I have some step that implicitly requires meta params
+----
+.S9Step.java
+[source,java]
+----
+package jbehave.myking520.github.junit.steps.ls9;
+
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Named;
+
+public class S9Step {
+	@Given("I have some step that implicitly requires meta params")
+	public void givenAThemeAndVariant(@Named("variant") String variant, @Named("theme") String theme) {
+	   System.out.println("variant="+variant+"\t\ttheme="+theme);
+	}
+}
+----
+.S9Story.java
+[source,java]
+----
+package jbehave.myking520.github.junit.stories.ls9;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+
+import jbehave.myking520.github.junit.steps.ls9.S9Step;
+
+public class S9Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S9Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		return new MostUsefulConfiguration();
+	}
+}
+
+----
+.结果
+image::images/Image-040117-022653.022.png[]
+

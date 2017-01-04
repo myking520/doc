@@ -1,0 +1,74 @@
+## 结果表格
+
+当结果以表格形式收集时，一个典型的用例是一次验证它们.。为此，JBehave提供了结果表格
+
+.S8Step.java
+[source,java]
+----
+package jbehave.myking520.github.junit.steps.ls8;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.hamcrest.Matchers;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.model.ExamplesTable;
+import org.jbehave.core.model.OutcomesTable;
+
+public class S8Step {
+	@Then("the values returned are: $table")
+	public void theValuesReturnedAre(ExamplesTable table) {
+	    Map<String,String> actual = actualValues(); // obtained from another step invocation
+	    OutcomesTable outcomes = new OutcomesTable();
+	    Map<String,String> expected = table.getRow(0); // assuming all values are contained in a single row
+	    for ( String key : expected.keySet() ){
+	    	System.out.println(key+"--actual="+actual.get(key)+"   expected="+expected.get(key));
+	        outcomes.addOutcome(key, actual.get(key), Matchers.equalTo(expected.get(key)));            
+	    }
+	    outcomes.verify();
+	}
+
+	private Map<String, String> actualValues() {
+		Map<String,String> rmap=new HashMap<String, String>();
+		rmap.put("name", "key-1");
+		rmap.put("trades", "value-1");
+		return rmap;
+	}
+}
+
+----
+.s8_story.story
+----
+Then the values returned are:
+|name|trades|
+|key-1|value-1|
+----
+
+.S8Story.java
+[source,java]
+----
+package jbehave.myking520.github.junit.stories.ls8;
+
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.junit.JUnitStory;
+import org.jbehave.core.steps.InjectableStepsFactory;
+import org.jbehave.core.steps.InstanceStepsFactory;
+
+import jbehave.myking520.github.junit.steps.ls8.S8Step;
+
+public class S8Story extends JUnitStory{
+	@Override
+	public InjectableStepsFactory stepsFactory() {
+		return new InstanceStepsFactory(this.configuration(),new S8Step());
+	}
+
+	@Override
+	public Configuration configuration() {
+		return new MostUsefulConfiguration();
+	}
+}
+
+----
+.结果
+image::images/Image-030117-055619.817.png[]
