@@ -1,5 +1,5 @@
-## 参数化场景
-### 参数化场景
+== 参数化场景
+=== 参数化场景
 
 故事作家经常发现自己重复的场景，或部分，通过简单地改变一些参数值。这些都是使用JBehave理想化特征。让我们来看一看例子：
 ----
@@ -37,7 +37,7 @@ public void aStock(@Named("symbol") String symbol, @Named("threshold") double th
     // ...
 }
 ----
-#### 完整示例
+==== 完整示例
 .s6_2_story.story
 ----
 Narrative:
@@ -127,7 +127,7 @@ public class S6_2Story extends JUnitStory{
 
 image::images/Image-221216-085830.576.png[]
 
-### 自定义参数分隔符
+=== 自定义参数分隔符
 比如我们使用"[]"
 .story
 ----
@@ -154,8 +154,8 @@ public void aStock(@Named("symbol") String symbol, @Named("threshold") double th
 new MostUsefulConfiguration()
         .useParameterControls(new ParameterControls().useNameDelimiterLeft("[").useNameDelimiterRight("]"));
 ----
-### 根据用户参数化分隔
-#### 方法一
+=== 根据用户参数化分隔
+==== 方法一
 .stroy
 ----
 Given a stock of <symbol> and a <threshold>
@@ -179,7 +179,7 @@ public void aStock(String symbol, double threshold) {
 new MostUsefulConfiguration()
         .useParameterControls(new ParameterControls().useDelimiterNamedParameters(true));
 ----
-#### 方法二
+==== 方法二
 .story
 ----
 Given a stock of <symbol> and a <threshold>
@@ -196,7 +196,7 @@ public void aStock(String symbol) {
     // ...
 }
 ----
-### 从外部资源加载参数
+=== 从外部资源加载参数
 .story
 ----
 Given a stock of <symbol> and a <threshold>

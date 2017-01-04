@@ -1,5 +1,5 @@
-## 表格参数
-### 表格参数
+== 表格参数
+=== 表格参数
 场景编辑器可能希望以表格结构表示参数.。例如:
 ----
 Given the traders: 
@@ -113,7 +113,7 @@ public class S7Story extends JUnitStory{
 ----
 .结果
 image::images/Image-231216-023935.878.png[]
-### 参数表格
+=== 参数表格
 -----
 Given that Larry has done <trades> trades
 Then the traders activity is: 

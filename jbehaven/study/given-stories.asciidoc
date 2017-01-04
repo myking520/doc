@@ -1,5 +1,5 @@
-## 利用文本的故事
-### 从外部加载故事
+== 利用文本的故事
+=== 从外部加载故事
 .例子
 ----
 !-- A precondition to entire story
@@ -126,7 +126,7 @@ public class S6_3Story extends JUnitStory{
 .运行结果
 image::images/Image-231216-120946.757.png[]
 
-### 根据场景元素过滤引入的故事
+=== 根据场景元素过滤引入的故事
 一个故事中有多个场景，但是我们只使用其中的部分，例如：
 ----
 GivenStories: path/to/precondition.story#{id1:scenario1;id2:scenario2}
@@ -148,9 +148,9 @@ Meta: @id3 scenario3
       
 Given ... // scenario not executed as a precondition
 ----
-### 通过实例参数化GivenStories
+=== 通过实例参数化GivenStories
 
-#### 有数据源参数化GivenStories
+==== 有数据源参数化GivenStories
 ----
 Meta: @One uno @Two due
  
@@ -160,7 +160,7 @@ Scenario:  A scenario which is executed after the parametrised story-level given
  
 Given ... // normal scenario steps
 ----
-#### 通过实例参数化GivenStories
+==== 通过实例参数化GivenStories
 另一种方法是使用Examples：关键字来收集参数集，允许用户通过锚提供一个可选的附加的＃{row}形式的故事路径，这被解释为参数的行号 注入故事执行。
 
 例如，如果我们想使用两个不同的参数集来执行同一个给定的故事，指定为示例表的第一行和第二行：

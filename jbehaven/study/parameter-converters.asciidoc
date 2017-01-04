@@ -1,5 +1,5 @@
-## 参数转换
-### 自定义参数转换
+== 参数转换
+=== 自定义参数转换
 .stroy
 ----
 Given a stock of symbols STK1,STK2 and thresholds of 10.0,20.0
@@ -31,7 +31,7 @@ private ParameterConverter[] customConverters(Keywords keywords) {
     return converters.toArray(new ParameterConverter[converters.size()]);
 }
 -----
-#### 完整示例
+==== 完整示例
 .s6_1_story.story
 -----
 Narrative:
@@ -113,7 +113,7 @@ public class S6_1Story extends JUnitStory{
 .输出
 image::images/Image-221216-061421.711.png[]
 
-### 声明参数转换
+=== 声明参数转换
 [source,java]
 -----
 public class TraderConverter implements ParameterConverter {
@@ -142,7 +142,7 @@ public void aTrader(Trader trader) {
     // Trader object is provided to the method as parameter
 }
 -----
-### 参数转换注解
+=== 参数转换注解
 [source,java]
 ----
 public MySteps() {

@@ -1,4 +1,4 @@
-## 元数据参数化
+== 元数据参数化
 在我们的故事中的元信息的另一个用途是允许我们的步骤中使用的隐含场景参数的定义。
 例如，我们可以在故事和场景级别（通常继承模式）中定义元属性，并在步骤方法中注入这些参数，就像它们在步骤本身中指定的一样.：
 ----
@@ -24,7 +24,7 @@ public void givenAThemeAndVariant(@Named("variant") String variant, @Named("them
     this.variant = variant;
 }
 ----
-### 示例
+=== 示例
 .s9_story.story
 ----
 Meta: 

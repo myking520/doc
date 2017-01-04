@@ -1,4 +1,4 @@
-## 故事语法
+== 故事语法
 
 ----
 A story is a collection of scenarios
@@ -36,7 +36,7 @@ Examples:
 |abc|be captured    |
 |xyz|not be captured|
 ----
-## 步骤注解
+=== 步骤注解
 @Given  给与
 [source,java]
 -----

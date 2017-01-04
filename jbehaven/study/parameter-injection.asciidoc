@@ -1,5 +1,5 @@
-## 参数注入
-### 顺序参数
+== 参数注入
+=== 顺序参数
 示例.
 ====
 Given a stock of symbol STK1 and a threshold of 10.0
@@ -23,7 +23,7 @@ public void aStock(String sym2bol, double thres2hold) {
 }
 ----
 
-### 注释命名参数
+=== 注释命名参数
 如果我们想拥有命名参数，一个机制是使用注释.使用命名参数的一个原因是，我们可以有任何顺序出现的方法参数.
 
 [source,java]
@@ -33,7 +33,7 @@ public void aStock(@Named("threshold") double aThreshold, @Named("symbol") Strin
      System.out.println(aSymbol+"---->"+aThreshold);
 }
 ----
-### 通过配置参数解析器
+=== 通过配置参数解析器
 使用命名参数等效的方式，不使用注释，是利用paranamer，通过配置配置
 
 [source,java]
