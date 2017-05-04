@@ -1,0 +1,33 @@
+== 介绍
+== k8s 组件
+=== master 组件
+====  kube-apiserver
+暴露api server。可以通过api 来控制k8s。他支持水平扩展
+
+==== ETCD
+ETCD是用于共享配置和服务发现的分布式，一致性的KV存储系统
+
+==== kube-controller-manager
+
+Controller Manager Server负责所有其它的功能，比如endpoints控制器负责Endpoints对象的创建，更新。node控制器负责节点的发现，管理和监控。将来可能会把这些控制器拆分并且提供插件式的实现。
+
+==== kube-scheduler
+
+负责节点资源管理，接受来自kube-apiserver创建Pods任务，并分配到某个节点
+
+==== addons
+插件是实现集群功能舱和服务。豆荚可以通过部署，replicationcontollers托管命名空间插件等对象被创建在“kube-system"
+插件管理需要创建和维护插件资源的责任。
+
+==== DNS
+==== User interface
+==== Container Resource Monitoring
+==== Cluster-level Logging
+=== node 组件
+
+==== kubelet
+==== kube-proxy
+==== docker
+==== rkt
+==== supervisord
+==== fluentd
