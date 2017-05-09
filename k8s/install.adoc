@@ -1,1 +1,87 @@
+
 == 安装
+=== master
+==== 安装
+. 首先下载k8s
++
+https://github.com/kubernetes/kubernetes/releases/download/v1.5.7/kubernetes.tar.gz
++
+image::images/Image-040517-124206.698.png[]
+. 解压
++
+tar -xvf kubernetes.tar.gz 
+. 进入 kubernetes/cluster/ 执行命令./get-kube-binaries.sh
++
+image::images/Image-040517-124559.686.png[]
+. 根据提示移动处理文件
++
+image::images/Image-040517-125124.569.png[]
+. 进入server 解压kubernetes-server-linux-amd64.tar.gz
+
+. 导入镜像
+.. 下载etcd 镜像
++
+docker pull googlecontainer/etcd:2.2.1
+.. 导入master相关镜像
+... 进入上面解压的kubernetes-server-linux-amd64.tar.gz 里面的bin目录进行镜像导入
++
+image::images/Image-040517-013028.371.png[]
+... 使用docker load -i 镜像.tar 来导入
++
+image::images/Image-040517-013339.295.png[]
+
+==== 启动
+. 启动etcd
++
+docker run -d -i --name etcd -p 2379:2379 -p 2380:2380 -p 4001:4001 -p 7001:7001 googlecontainer/etcd:2.2.1 etcd
+docker exec -it etcd etcdctl set /github.myking520.com/network/config '{"Network": "111.0.0.0/16"}'
+. 启动apiserver
++
+-----
+./kube-apiserver --insecure-bind-address=0.0.0.0 \
+                 --insecure-port=8080 \
+                 --service-cluster-ip-range='10.254.0.0/16' \
+                  --service-node-port-range=20000-60000 \
+                 --etcd-servers=http://127.0.0.1:4001 \
+                 --allow-privileged=false
+-----
++
+或者
++
+------
+docker run -d \
+  --name=apiserver \
+  --net=host \
+  gcr.io/google_containers/kube-apiserver:9312bc9403d9a1dda49a2fe70c897deb \
+  kube-apiserver \
+  --insecure-bind-address=0.0.0.0 \
+  --service-cluster-ip-range=11.0.0.0/16 \
+  --etcd-servers=http://127.0.0.1:4001
+------
+. 启动 controller-manager
++
+---------
+docker run -d \
+  --name=cm \
+  gcr.io/google_containers/kube-controller-manager:0005ed016737cb2c14929aa8efdf5be7 \
+  kube-controller-manager \
+  --master=127.0.0.1:8080
+---------
+. 启动 scheduler
++
+-----
+docker run -d \
+  --name=scheduler \
+  gcr.io/google_containers/kube-scheduler:5e5a1fe4ee49b94c0f3d2e745a48cb65 \
+  kube-scheduler \
+  --master=127.0.0.1:8080
+-----
+  
+=== etc 说明
+
+==== 端口
+
+* 2379 提供 HTTP API 服务
+* 2380 与peer 通信
+* 4001 是老的http api服务端口 已经被2379 所替换
+* 7001 同样被2380所替换是老的端口
