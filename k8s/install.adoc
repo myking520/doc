@@ -28,15 +28,32 @@ docker pull googlecontainer/etcd:2.2.1
 * docker load < kubernetes/server/bin/kube-controller-manager.tar
 * docker load < kubernetes/server/bin/kube-scheduler.tar
 
-
-==== 启动
 . 启动etcd
 +
 -----
 docker run -d  --name etcd -p 2379:2379 -p 2380:2380 -p 4001:4001 -p 7001:7001 googlecontainer/etcd:2.2.1 etcd --listen-peer-urls 'http://0.0.0.0:2380,http://0.0.0.0:7001' --listen-client-urls='http://0.0.0.0:2379,http://0.0.0.0:4001'  --advertise-client-urls 'http://0.0.0.0:2379,http://0.0.0.0:4001'
-
 docker exec -it etcd etcdctl set /github.myking520.com/network/config '{"Network": "11.0.0.0/16"}'
 -----
+. 安装flannel (所有节点) +
+.. 下载 + 
+flannel-v0.7.1-linux-amd64.tar.gz
+.. 解压
+tar -xvf flannel-v0.7.1-linux-amd64.tar.gz
+.. 启动 
++
+--------
+./flanneld \
+  -etcd-endpoints="http://192.168.78.134:2379" \
+  -etcd-prefix="/coreos.com/network" \
+  -iface=ens33 
+--------
+.. 生成docker相关信息 +
+./mk-docker-opts.sh 
+
+==== 启动
+
+
+
 +
 . 启动apiserver
 +
@@ -87,6 +104,30 @@ docker run -d \
 . 查看信息 +
 ./kubectl -s 192.168.78.134:8080 version
 
+=== node
+
+. 启动kubelet 
++
+------
+./kubelet \
+ --api-servers=192.168.78.134:8080 \ <1>
+ --node-ip=192.168.78.134 \ <2>
+ --hostname_override=192.168.78.134 <3>
+------
+<1> api server地址 多个的话请使用多个
+<2> 节点的ip
+<3> 设置节点的名称
+. 启动kube-proxy
+./kube-proxy --master=192.168.78.134:8080
+
+=== 状态查看
+命令来查看pod、replication controller、service和endpoint
+------
+ ./kubectl -s 192.168.78.134:8080 get po
+ ./kubectl -s 192.168.78.134:8080 get rc
+ ./kubectl -s 192.168.78.134:8080 get svc
+ ./kubectl -s 192.168.78.134:8080 get ep  
+------
 === etc 说明
 
 ==== 端口
