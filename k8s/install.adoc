@@ -6,16 +6,13 @@
 +
 https://github.com/kubernetes/kubernetes/releases/download/v1.5.7/kubernetes.tar.gz
 +
-image::images/Image-040517-124206.698.png[]
 . 解压
 +
 tar -xvf kubernetes.tar.gz 
 . 进入 kubernetes/cluster/ 执行命令./get-kube-binaries.sh
 +
-image::images/Image-040517-124559.686.png[]
 . 根据提示移动处理文件
 +
-image::images/Image-040517-125124.569.png[]
 . 进入server 解压kubernetes-server-linux-amd64.tar.gz
 
 . 导入镜像
@@ -25,16 +22,22 @@ docker pull googlecontainer/etcd:2.2.1
 .. 导入master相关镜像
 ... 进入上面解压的kubernetes-server-linux-amd64.tar.gz 里面的bin目录进行镜像导入
 +
-image::images/Image-040517-013028.371.png[]
 ... 使用docker load -i 镜像.tar 来导入
-+
-image::images/Image-040517-013339.295.png[]
+* docker load < kubernetes/server/bin/kube-proxy.tar
+* docker load < kubernetes/server/bin/kube-apiserver.tar
+* docker load < kubernetes/server/bin/kube-controller-manager.tar
+* docker load < kubernetes/server/bin/kube-scheduler.tar
+
 
 ==== 启动
 . 启动etcd
 +
-docker run -d -i --name etcd -p 2379:2379 -p 2380:2380 -p 4001:4001 -p 7001:7001 googlecontainer/etcd:2.2.1 etcd
-docker exec -it etcd etcdctl set /github.myking520.com/network/config '{"Network": "111.0.0.0/16"}'
+-----
+docker run -d  --name etcd -p 2379:2379 -p 2380:2380 -p 4001:4001 -p 7001:7001 googlecontainer/etcd:2.2.1 etcd --listen-peer-urls 'http://0.0.0.0:2380,http://0.0.0.0:7001' --listen-client-urls='http://0.0.0.0:2379,http://0.0.0.0:4001'  --advertise-client-urls 'http://0.0.0.0:2379,http://0.0.0.0:4001'
+
+docker exec -it etcd etcdctl set /github.myking520.com/network/config '{"Network": "11.0.0.0/16"}'
+-----
++
 . 启动apiserver
 +
 -----
@@ -45,27 +48,32 @@ docker exec -it etcd etcdctl set /github.myking520.com/network/config '{"Network
                  --etcd-servers=http://127.0.0.1:4001 \
                  --allow-privileged=false
 -----
-+
 或者
 +
 ------
-docker run -d \
+docker run -it \
   --name=apiserver \
   --net=host \
-  gcr.io/google_containers/kube-apiserver:9312bc9403d9a1dda49a2fe70c897deb \
+  gcr.io/google_containers/kube-apiserver:77e85c0207d0e512f452ed2febfca00b \
   kube-apiserver \
-  --insecure-bind-address=0.0.0.0 \
-  --service-cluster-ip-range=11.0.0.0/16 \
-  --etcd-servers=http://127.0.0.1:4001
+  --insecure-bind-address="192.168.78.134" \
+  --service-cluster-ip-range="11.0.0.0/16" \
+  --etcd-servers="http://192.168.78.134:4001" \
+  --secure-port=0 \
+  --admission-control="NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota" \
+  --v=2 \
+  --storage-backend=etcd2
+
 ------
 . 启动 controller-manager
 +
 ---------
 docker run -d \
   --name=cm \
+  --net =host \
   gcr.io/google_containers/kube-controller-manager:0005ed016737cb2c14929aa8efdf5be7 \
   kube-controller-manager \
-  --master=127.0.0.1:8080
+  --master=http://192.168.78.134:8080
 ---------
 . 启动 scheduler
 +
@@ -74,9 +82,11 @@ docker run -d \
   --name=scheduler \
   gcr.io/google_containers/kube-scheduler:5e5a1fe4ee49b94c0f3d2e745a48cb65 \
   kube-scheduler \
-  --master=127.0.0.1:8080
+  --master=http://192.168.78.134:8080
 -----
-  
+. 查看信息 +
+./kubectl -s 192.168.78.134:8080 version
+
 === etc 说明
 
 ==== 端口
