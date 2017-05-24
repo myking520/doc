@@ -117,7 +117,7 @@ kube-apiserver \ <4>
 --service-cluster-ip-range="11.0.0.0/16" \ <6>
 --etcd-servers="http://192.168.174.130:4001" \ <7>
 --secure-port=0 \ <8>
---admission-control="NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota" \ <9>
+--admission-control="NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ResourceQuota" \ <9>
 --v=2 \ <10>
 --storage-backend=etcd2 <11>
 ------
